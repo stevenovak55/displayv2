@@ -1,0 +1,45 @@
+/* Styles for MLS Display Admin Pages */
+
+.mld-image-preview img {
+    max-width: 200px;
+    max-height: 50px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    padding: 5px;
+    background: #f7f7f7;
+}
+
+/* Styles for Icon & Label Manager */
+.mld-icon-manager .wp-list-table th,
+.mld-icon-manager .wp-list-table td {
+    vertical-align: middle;
+}
+
+.mld-icon-uploader-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mld-icon-uploader-wrapper .mld-image-preview {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #ddd;
+    background: #f7f7f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mld-icon-uploader-wrapper .mld-image-preview img {
+    max-width: 32px;
+    max-height: 32px;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.mld-icon-uploader-wrapper .mld-icon-url-input {
+    flex-grow: 1;
+}
