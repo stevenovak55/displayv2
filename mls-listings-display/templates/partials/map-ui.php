@@ -1,0 +1,232 @@
+<?php
+/**
+ * Template part for the map user interface.
+ * v4.3.0
+ * - FIX: Corrected HTML structure to resolve major layout bug in half-map view.
+ * - FIX: Ensured new filters use original CSS classes for consistent styling.
+ */
+
+$options = get_option('mld_settings');
+$logo_url = !empty($options['mld_logo_url']) ? esc_url($options['mld_logo_url']) : '';
+
+if ( is_ssl() && !empty($logo_url) ) {
+    $logo_url = str_replace('http://', 'https://', $logo_url);
+}
+
+$filter_icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>';
+
+$property_types = [
+    'For Sale' => 'Residential',
+    'For Rent' => 'Residential Lease',
+    'Land' => 'Land',
+    'Commercial Sale' => 'Commercial Sale',
+    'Commercial Lease' => 'Commercial Lease',
+    'Business Opportunity' => 'Business Opportunity'
+];
+?>
+<div id="bme-top-bar">
+    <?php if ($logo_url): ?>
+    <div id="bme-logo-container">
+        <img src="<?php echo $logo_url; ?>" alt="Company Logo">
+    </div>
+    <?php endif; ?>
+    
+    <div id="bme-search-controls-container">
+        <div id="bme-search-wrapper">
+            <div id="bme-search-bar-wrapper">
+                <input type="text" id="bme-search-input" placeholder="City, Address, School, ZIP, Agent, ID">
+                
+                <div class="bme-nearby-toggle-container">
+                    <label for="bme-nearby-toggle" class="bme-nearby-label">Nearby</label>
+                    <label class="bme-switch">
+                        <input type="checkbox" id="bme-nearby-toggle">
+                        <span class="bme-slider"></span>
+                    </label>
+                </div>
+
+                <div id="bme-autocomplete-suggestions"></div>
+            </div>
+        </div>
+        
+        <div id="bme-property-type-desktop-container" class="bme-mode-select-wrapper">
+             <select id="bme-property-type-select" class="bme-control-select">
+                <?php foreach ($property_types as $label => $value): ?>
+                    <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <button id="bme-filters-button" class="bme-control-button" aria-label="More Filters">
+            <?php echo $filter_icon_svg; ?>
+        </button>
+    </div>
+</div>
+
+<div id="bme-filter-tags-container"></div>
+
+<div id="bme-listings-count-indicator"></div>
+
+<div id="bme-filters-modal-overlay">
+    <div id="bme-filters-modal-content">
+        <div id="bme-filters-modal-header">
+            <button id="bme-filters-modal-close" aria-label="Close Filters Modal">&times;</button>
+        </div>
+        <div id="bme-filters-modal-body">
+            
+            <div class="bme-filter-group" id="bme-modal-search-group">
+                <div id="bme-search-wrapper-modal">
+                    <div id="bme-search-bar-wrapper-modal">
+                        <input type="text" id="bme-search-input-modal" placeholder="City, Address, School, ZIP, Agent, ID">
+                        <div id="bme-autocomplete-suggestions-modal"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bme-filter-group" id="bme-property-type-mobile-container">
+                <label>Property Type</label>
+            </div>
+
+            <div id="bme-rental-filters" class="bme-filter-group" style="display: none;">
+                <label for="bme-filter-available-by">Available By</label>
+                <div class="bme-filter-row">
+                    <input type="date" id="bme-filter-available-by" class="bme-filter-input">
+                    <label class="bme-inline-checkbox"><input type="checkbox" id="bme-filter-available-now"> Now</label>
+                </div>
+            </div>
+
+            <div class="bme-filter-group">
+                <label>Price</label>
+                <div id="bme-price-filter-container">
+                    <div id="bme-price-histogram">
+                        <div class="bme-placeholder">Loading price data...</div>
+                    </div>
+                    <div id="bme-price-slider">
+                        <div id="bme-price-slider-track"></div>
+                        <div id="bme-price-slider-range"></div>
+                        <div id="bme-price-slider-handle-min" class="bme-price-slider-handle"></div>
+                        <div id="bme-price-slider-handle-max" class="bme-price-slider-handle"></div>
+                    </div>
+                    <div class="bme-filter-row">
+                        <input type="text" id="bme-filter-price-min" placeholder="Min" data-raw-value="">
+                        <span>-</span>
+                        <input type="text" id="bme-filter-price-max" placeholder="Max" data-raw-value="">
+                    </div>
+                    <p class="bme-input-note">Use these fields to set a price outside the slider's range.</p>
+                </div>
+            </div>
+
+            <div class="bme-filter-group">
+                <label>Beds</label>
+                <div class="bme-button-group multi-select" id="bme-filter-beds">
+                    <button data-value="0" class="active">Any</button>
+                    <button data-value="1">1</button>
+                    <button data-value="2">2</button>
+                    <button data-value="3">3</button>
+                    <button data-value="4">4</button>
+                    <button data-value="5">5+</button>
+                </div>
+            </div>
+
+            <div class="bme-filter-group">
+                <label>Baths</label>
+                <div class="bme-button-group min-select" id="bme-filter-baths">
+                    <button data-value="0" class="active">Any</button>
+                    <button data-value="1">1+</button>
+                    <button data-value="1.5">1.5+</button>
+                    <button data-value="2">2+</button>
+                    <button data-value="2.5">2.5+</button>
+                    <button data-value="3">3+</button>
+                </div>
+            </div>
+
+            <div class="bme-filter-group" id="bme-home-type-group">
+                <label>Home Type</label>
+                <div class="bme-home-type-grid" id="bme-filter-home-type">
+                    <div class="bme-placeholder">Loading...</div>
+                </div>
+            </div>
+            
+            <div class="bme-filter-group" id="bme-structure-type-group">
+                <label>Structure Type</label>
+                <div class="bme-checkbox-group" id="bme-filter-structure-type">
+                    <div class="bme-placeholder">Loading...</div>
+                </div>
+            </div>
+            
+            <div class="bme-filter-group" id="bme-style-group">
+                <label>Style</label>
+                <div class="bme-checkbox-group" id="bme-filter-architectural-style">
+                    <div class="bme-placeholder">Loading...</div>
+                </div>
+            </div>
+
+            <div class="bme-filter-group" id="bme-status-filter-group">
+                <label>Status</label>
+                <div class="bme-checkbox-group" id="bme-filter-status">
+                    <div class="bme-placeholder">Loading...</div>
+                </div>
+            </div>
+
+            <div class="bme-filter-group">
+                <label>Property Details</label>
+                <div class="bme-property-details-grid">
+                    <label for="bme-filter-sqft-min">Square Feet</label>
+                    <div class="bme-filter-row">
+                        <input type="number" id="bme-filter-sqft-min" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="bme-filter-sqft-max" placeholder="Max">
+                    </div>
+
+                    <label for="bme-filter-lot-size-min">Lot Size (sq ft)</label>
+                    <div class="bme-filter-row">
+                        <input type="number" id="bme-filter-lot-size-min" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="bme-filter-lot-size-max" placeholder="Max">
+                    </div>
+
+                    <label for="bme-filter-year-built-min">Year Built</label>
+                     <div class="bme-filter-row">
+                        <input type="number" id="bme-filter-year-built-min" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="bme-filter-year-built-max" placeholder="Max">
+                    </div>
+                    
+                    <label for="bme-filter-entry-level-min">Floor Level</label>
+                     <div class="bme-filter-row">
+                        <input type="number" id="bme-filter-entry-level-min" placeholder="Lowest Floor">
+                        <span>-</span>
+                        <input type="number" id="bme-filter-entry-level-max" placeholder="Highest Floor">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bme-filter-group">
+                 <label>Parking</label>
+                 <div class="bme-button-group min-select" id="bme-filter-garage-spaces">
+                    <button data-value="0" class="active">Any Garage</button>
+                    <button data-value="1">1+</button>
+                    <button data-value="2">2+</button>
+                    <button data-value="3">3+</button>
+                </div>
+                <div class="bme-button-group min-select" id="bme-filter-parking-total" style="margin-top: 10px;">
+                    <button data-value="0" class="active">Any Parking</button>
+                    <button data-value="1">1+</button>
+                    <button data-value="2">2+</button>
+                    <button data-value="3">3+</button>
+                </div>
+            </div>
+
+            <div class="bme-filter-group">
+                <label>Features & Amenities</label>
+                <div class="bme-checkbox-group" id="bme-filter-amenities">
+                    <div class="bme-placeholder">Loading...</div>
+                </div>
+            </div>
+
+        </div>
+        <div id="bme-filters-modal-footer">
+            <button id="bme-clear-filters-btn" class="button-secondary">Reset All</button>
+            <button id="bme-apply-filters-btn" class="button-primary">See Listings</button>
+        </div>
+    </div>
+</div>
